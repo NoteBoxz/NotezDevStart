@@ -34,8 +34,9 @@ namespace NotezDevStart
 
             Patch();
             ConfigFile();
-            SetupTempFolder();
             IsHostInstance = !autoJoinLan || !CheckMutex();
+            if (IsHostInstance)
+                SetupTempFolder();
 
             Logger.LogInfo($"{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} has loaded!");
         }
@@ -48,6 +49,25 @@ namespace NotezDevStart
             autoPullLever = Config.Bind("General", "AutoPullLever", false, "Automatically pull the ship's lever on startup.").Value;
             tpToEntrance = Config.Bind("General", "TeleportToEntrance", false, "Automatically teleports you to the main entrance on level load (Requires 'AutoPullLever' enabled).").Value;
             teleportInside = Config.Bind("General", "TeleportInside", false, "Teleports you inside the facility instead (Requires 'TeleportToEntrance' enabled).").Value;
+        }
+
+        private static string CensorPath(string path)
+        {
+            try
+            {
+                string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                if (!string.IsNullOrEmpty(userProfile) && path.StartsWith(userProfile, StringComparison.OrdinalIgnoreCase))
+                {
+                    string relativePath = path.Substring(userProfile.Length);
+                    string usersFolder = Path.GetDirectoryName(userProfile);
+                    return Path.Combine(usersFolder, "(USER)", relativePath.TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+                }
+                return path;
+            }
+            catch
+            {
+                return path; // Return original path if censoring fails
+            }
         }
 
         private void SetupTempFolder()
@@ -69,7 +89,7 @@ namespace NotezDevStart
                     Directory.CreateDirectory(TempFolderPath);
                 }
 
-                Logger.LogDebug($"Temp folder setup at: {TempFolderPath}");
+                Logger.LogDebug($"Temp folder setup at: {CensorPath(TempFolderPath)}");
             }
             catch (Exception ex)
             {
