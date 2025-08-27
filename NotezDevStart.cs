@@ -11,6 +11,7 @@ namespace NotezDevStart
 {
     [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
     [BepInDependency("dev.flero.lethal.FastStartup", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency("imabatby.lethallevelloader", BepInDependency.DependencyFlags.SoftDependency)]
     public class NotezDevStart : BaseUnityPlugin
     {
         public static NotezDevStart Instance { get; private set; } = null!;
@@ -127,10 +128,10 @@ namespace NotezDevStart
                 }
                 catch (Exception e)
                 {
-                    Logger.LogError($"Error patching type {type.FullName}: {e.Message}");
+                    Logger.LogDebug($"Error patching type {type.FullName}: {e.Message}");
                     if (e.InnerException != null)
                     {
-                        Logger.LogError($"Inner exception: {e.InnerException.Message}");
+                        Logger.LogDebug($"Inner exception: {e.InnerException.Message}");
                     }
                 }
             }
